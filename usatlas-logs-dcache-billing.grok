@@ -1,0 +1,46 @@
+## DCACHE_BILLING
+DCACHE_BILLING_LOG (%{DCACHE_BILLING_DOOR_REQUEST_INFO_MESSAGE}|%{DCACHE_BILLING_MOVER_INFO_MESSAGE}|%{DCACHE_BILLING_POOL_HIT_INFO_MESSAGE}|%{DCACHE_BILLING_REMOVE_FILE_INFO_MESSAGE}|%{DCACHE_BILLING_STORAGE_INFO_MESSAGE}|%{DCACHE_BILLING_WARNING_PNFS_FILE_INFO_MESSAGE})
+DCACHE_BILLING_LOGFILE /var/lib/dcache/billing/%{YEAR:year}/%{GREEDYDATA}
+
+## Data Matchmakers
+DCACHE_BILLING_DOOR_REQUEST_INFO_MESSAGE %{DCACHE_BILLING_DATE:[dcache][billing][ts]} %{DCACHE_BILLING_CELL} %{DCACHE_BILLING_OWNER} %{DCACHE_BILLING_PNFSID_FS} %{DCACHE_BILLING_PATH} %{DCACHE_BILLING_STORAGE} %{NONNEGINT:[dcache][billing][transaction][time]} %{NONNEGINT:[dcache][billing][queued][time]} %{DCACHE_BILLING_RESPONSE}
+DCACHE_BILLING_MOVER_INFO_MESSAGE %{DCACHE_BILLING_DATE:[dcache][billing][ts]} %{DCACHE_BILLING_CELL} %{DCACHE_BILLING_PNFSID_FS} %{DCACHE_BILLING_PATH} %{DCACHE_BILLING_STORAGE} %{INT:[dcache][billing][transfer][size]} %{INT:[dcache][billing][connection][time]} %{WORD:[dcache][billing][isnew]} %{DCACHE_BILLING_PROTOCOL} %{DCACHE_BILLING_INITIATOR} %{DCACHE_BILLING_RESPONSE}
+DCACHE_BILLING_POOL_HIT_INFO_MESSAGE %{DCACHE_BILLING_DATE:[dcache][billing][ts]} %{DCACHE_BILLING_CELL} %{DCACHE_BILLING_PNFSID_FS} %{DCACHE_BILLING_PATH} %{DCACHE_BILLING_STORAGE} %{WORD:[dcache][billing][cached]} %{DCACHE_BILLING_PROTOCOL} %{DCACHE_BILLING_RESPONSE}
+DCACHE_BILLING_REMOVE_FILE_INFO_MESSAGE %{DCACHE_BILLING_DATE:[dcache][billing][ts]} %{DCACHE_BILLING_CELL} %{DCACHE_BILLING_PNFSID_FS} %{DCACHE_BILLING_PATH} %{DCACHE_BILLING_STORAGE} %{DCACHE_BILLING_RESPONSE}
+DCACHE_BILLING_STORAGE_INFO_MESSAGE %{DCACHE_BILLING_DATE:[dcache][billing][ts]} %{DCACHE_BILLING_CELL} %{DCACHE_BILLING_PNFSID_FS} %{DCACHE_BILLING_PATH} %{DCACHE_BILLING_STORAGE} %{INT:[dcache][billing][transfer][time]} %{INT:[dcache][billing][queued][time]} %{DCACHE_BILLING_RESPONSE}
+DCACHE_BILLING_WARNING_PNFS_FILE_INFO_MESSAGE %{DCACHE_BILLING_DATE:[dcache][billing][ts]} %{DCACHE_BILLING_CELL} %{DCACHE_BILLING_RESPONSE}
+
+## Modules
+DCACHE_BILLING_CELL \[%{WORD:[dcache][billing][cell][type]}:%{ALL_BETWEEN_COLUMNS:[dcache][billing][cell][name]}:%{WORD:[dcache][billing][action]}\]
+
+DCACHE_BILLING_DATE ([0-1][0-9].[0-3][0-9]) %{TIME}
+
+DCACHE_BILLING_INITIATOR \[%{NOTSPACE:[dcache][billing][initiator][name]}\]
+
+DCACHE_BILLING_INITIATOR_PARSER %{DCACHE_BILLING_INITIATOR_PARSER_1}|%{DCACHE_BILLING_INITIATOR_PARSER_2}|%{DCACHE_BILLING_INITIATOR_PARSER_3}|%{DCACHE_BILLING_INITIATOR_PARSER_4}
+DCACHE_BILLING_INITIATOR_PARSER_1 %{WORD:[dcache][billing][initiator][type]}:%{ALL_BETWEEN_COLUMNS:[dcache][billing][initiator][cell]}:%{NONNEGINT:[dcache][billing][initiator][timestamp]}
+DCACHE_BILLING_INITIATOR_PARSER_2 %{WORD:[dcache][billing][initiator][type]}:%{ALL_BETWEEN_COLUMNS:[dcache][billing][initiator][cell]}:%{ALL_BETWEEN_COLUMNS:[dcache][billing][initiator][id]}:%{NONNEGINT:[dcache][billing][initiator][timestamp]}
+DCACHE_BILLING_INITIATOR_PARSER_3 %{WORD:[dcache][billing][initiator][type]}:%{ALL_BETWEEN_COLUMNS:[dcache][billing][initiator][cell]}:%{NONNEGINT:[dcache][billing][initiator][timestamp]}-%{NONNEGINT}
+DCACHE_BILLING_INITIATOR_PARSER_4 %{WORD:[dcache][billing][initiator][type]}:%{HTTPDUSER:[dcache][billing][initiator][cell]}
+
+DCACHE_BILLING_OWNER \[%{QUOTEDSTRING:[dcache][billing][client][user][dn]}:%{INT:[dcache][billing][client][user][id]}:%{INT:[dcache][billing][client][user][group][id]}:(%{IPORHOST:[dcache][billing][client][address]}|%{WORD:[dcache][billing][client][address]})\]
+
+DCACHE_BILLING_ADDRESS (%{T1_IPORHOST_PORT})
+
+DCACHE_BILLING_PATH \[(%{URIPATH:[dcache][billing][protocol][path]}|%{WORD:[dcache][billing][protocol][path]}|parent:%{NOTSPACE:[dcache][billing][protocol][path]})\]
+
+DCACHE_BILLING_PNFSID_FS (\[%{BASE16NUM:[dcache][billing][pnfsid]},%{NONNEGINT:[dcache][billing][file][size]}\]|\[,0\])
+
+DCACHE_BILLING_PROTOCOL (%{DCACHE_BILLING_PROTOCOL_GFTP}|%{DCACHE_BILLING_PROTOCOL_HTTP}|%{DCACHE_BILLING_PROTOCOL_P2P}|%{DCACHE_BILLING_PROTOCOL_REMOTE_HTTPS}|%{DCACHE_BILLING_PROTOCOL_XROOTD})
+DCACHE_BILLING_PROTOCOL_GFTP \{%{USERNAME:[dcache][billing][protocol][name]} %{IP:[dcache][billing][protocol][address]} %{POSINT:[dcache][billing][protocol][port]}}
+DCACHE_BILLING_PROTOCOL_HTTP \{%{USERNAME:[dcache][billing][protocol][name]}:%{IP:[dcache][billing][protocol][address]}:%{NONNEGINT:[dcache][billing][protocol][port]}:%{USERNAME:[dcache][billing][door][domain]}:%{USERNAME:[dcache][billing][door][name]}:/pnfs%{URIPATH:[dcache][billing][protocol][path]}}
+DCACHE_BILLING_PROTOCOL_P2P \{%{USERNAME:[dcache][billing][protocol][name]}:%{IP:[dcache][billing][protocol][address]}:%{NONNEGINT:[dcache][billing][protocol][port]}:%{USERNAME:[dcache][billing][pool][domain]}:%{USERNAME:[dcache][billing][pool][name]}:/%{BASE16NUM}}
+DCACHE_BILLING_PROTOCOL_REMOTE_HTTPS \{%{USERNAME:[dcache][billing][protocol][name]}:%{URI:[dcache][billing][protocol][url]}}
+DCACHE_BILLING_PROTOCOL_XROOTD \{%{USERNAME:[dcache][billing][protocol][name]}:%{IP:[dcache][billing][protocol][address]}:%{POSINT:[dcache][billing][protocol][port]}}
+
+DCACHE_BILLING_PROTOCOL_URL %{URIPROTO:[dcache][billing][protocol][proto]}://(?:%{USER:[dcache][billing][protocol][user]}(?::[^@]*)?@)?(?:(?:%{DCACHE_URI_PORT:[dcache][billing][protocol][address]})?)?(?:%{URIPATH:[dcache][billing][protocol][path]}(?:%{URIPARAM:[dcache][billing][protocol][param]})?)?
+
+DCACHE_BILLING_RESPONSE \{%{NONNEGINT:[dcache][billing][error][code]}:%{GREEDYDATA:[dcache][billing][error][message]}}
+
+DCACHE_BILLING_STORAGE %{NOTSPACE:[dcache][billing][storage][class]}
+DCACHE_BILLING_STORAGE_PARSER (%{WORD:[dcache][billing][storage][storename]}:%{WORD:[dcache][billing][storage][group]}@%{WORD:[dcache][billing][storage][stype]}|%{NOTSPACE:[dcache][billing][storage][storename]})
